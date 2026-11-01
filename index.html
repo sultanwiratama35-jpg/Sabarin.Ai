@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sabarin.ai — Don't Reply Emotionally. Respond Intelligently.</title>
+    <meta name="description" content="Asisten krisis UMKM berbasis AI untuk menganalisis komplain pelanggan, merumuskan balasan diplomatis, dan memberi rekomendasi keputusan bisnis yang bijak." />
+    <meta property="og:title" content="Sabarin.ai — Asisten Krisis & Komplain UMKM" />
+    <meta property="og:description" content="Pahami masalah pelanggan, susun balasan sopan dan profesional, serta ambil keputusan resolusi terbaik tanpa terbawa emosi." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+      (function() {
+        // Intercept console.error to silence Vite HMR WebSocket connection logs in Cloud Sandbox iframe
+        var origConsoleError = console.error;
+        console.error = function() {
+          var str = Array.prototype.slice.call(arguments).map(function(arg) {
+            return typeof arg === 'object' ? (arg && (arg.message || JSON.stringify(arg))) : String(arg);
+          }).join(' ');
+
+          if (
+            str.indexOf('failed to connect to websocket') !== -1 ||
+            str.indexOf('WebSocket closed without opened') !== -1 ||
+            str.indexOf('[vite]') !== -1
+          ) {
+            return; // Ignore Vite HMR WebSocket connection failure in sandbox iframe
+          }
+          return origConsoleError.apply(console, arguments);
+        };
+
+        var origConsoleWarn = console.warn;
+        console.warn = function() {
+          var str = Array.prototype.slice.call(arguments).map(function(arg) {
+            return String(arg);
+          }).join(' ');
+
+          if (
+            str.indexOf('failed to connect to websocket') !== -1 ||
+            str.indexOf('WebSocket') !== -1
+          ) {
+            return;
+          }
+          return origConsoleWarn.apply(console, arguments);
+        };
+
+        window.addEventListener('unhandledrejection', function(event) {
+          var reason = event && event.reason;
+          var msg = reason ? (reason.message || String(reason)) : '';
+          if (msg.indexOf('WebSocket') !== -1 || msg.indexOf('websocket') !== -1) {
+            event.preventDefault();
+            if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+          }
+        });
+
+        window.addEventListener('error', function(event) {
+          var msg = event ? (event.message || '') : '';
+          var filename = event ? (event.filename || '') : '';
+          if (
+            msg.indexOf('WebSocket') !== -1 ||
+            msg.indexOf('websocket') !== -1 ||
+            filename.indexOf('@vite/client') !== -1
+          ) {
+            event.preventDefault();
+            if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+          }
+        });
+      })();
+    </script>
+  </head>
+  <body class="bg-slate-50 text-[#20213A] antialiased selection:bg-[#F2EDFF] selection:text-[#5632C8]">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

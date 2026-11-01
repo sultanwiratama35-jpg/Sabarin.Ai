@@ -1,0 +1,6 @@
+{
+  "name": "Sabarin.ai",
+  "description": "Asisten krisis UMKM berbasis AI untuk menganalisis komplain pelanggan, merumuskan balasan diplomatis, dan memberi rekomendasi keputusan bisnis yang bijak.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
