@@ -13,15 +13,17 @@ import {
   Smile,
   AlertCircle,
 } from 'lucide-react';
-import { ComplaintRecord } from '../types/complaint';
+import { ComplaintRecord, BusinessProfile } from '../types/complaint';
 
 interface DashboardProps {
+  businessProfile?: BusinessProfile;
   onStartComplaint: () => void;
   recentComplaints: ComplaintRecord[];
   onOpenComplaint: (complaint: ComplaintRecord) => void;
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({
+  businessProfile,
   onStartComplaint,
   recentComplaints,
   onOpenComplaint,
@@ -30,13 +32,15 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const criticalCount = recentComplaints.filter((c) => c.urgency === 'Kritis' || c.urgency === 'Tinggi').length;
   const resolvedCount = recentComplaints.filter((c) => c.status === 'Selesai').length;
 
+  const displayName = businessProfile?.businessName?.trim() || 'Owner';
+
   return (
     <div className="space-y-7 max-w-6xl mx-auto">
       {/* Top Welcome Banner (Matches Mockup) */}
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-white via-white to-[#FAF7FF] border border-[#E9E8F0] p-7 md:p-9 shadow-xs flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="space-y-3 z-10 max-w-xl text-center md:text-left">
           <h1 className="text-2xl md:text-3xl font-extrabold text-slate-800 tracking-tight leading-snug">
-            Halo, Owner! 👋
+            Halo, {displayName}! 👋
           </h1>
           <p className="text-sm md:text-base text-slate-500 leading-relaxed font-normal">
             Tenang, keluhan pelanggan bisa dihadapi dengan lebih bijak bersama Sabarin.ai.

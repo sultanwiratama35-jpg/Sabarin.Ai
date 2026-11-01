@@ -25,16 +25,16 @@ export function saveStoredProfile(profile: BusinessProfile): void {
 export function getStoredHistory(): ComplaintRecord[] {
   try {
     const raw = localStorage.getItem(HISTORY_KEY);
-    if (raw) {
+    if (raw !== null) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) {
+      if (Array.isArray(parsed)) {
         return parsed;
       }
     }
   } catch (e) {
     console.error('Failed to read complaints history from localStorage', e);
   }
-  // Initialize with realistic seed history
+  // Initialize with realistic seed history if not previously set
   saveStoredHistory(INITIAL_COMPLAINT_HISTORY);
   return INITIAL_COMPLAINT_HISTORY;
 }
@@ -62,6 +62,17 @@ export function updateComplaintInHistory(complaint: ComplaintRecord): void {
   } else {
     addComplaintToHistory(complaint);
   }
+}
+
+export function deleteComplaintFromHistory(id: string): ComplaintRecord[] {
+  const current = getStoredHistory();
+  const updated = current.filter((c) => c.id !== id);
+  saveStoredHistory(updated);
+  return updated;
+}
+
+export function clearAllComplaintHistory(): void {
+  saveStoredHistory([]);
 }
 
 /**

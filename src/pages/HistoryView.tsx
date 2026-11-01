@@ -12,6 +12,8 @@ import {
   Sparkles,
   ChevronRight,
   RotateCcw,
+  Trash2,
+  X,
 } from 'lucide-react';
 import { ComplaintRecord, ChannelType, UrgencyLevel } from '../types/complaint';
 
@@ -20,6 +22,8 @@ interface HistoryViewProps {
   onSelectComplaint: (complaint: ComplaintRecord) => void;
   onUpdateStatus: (id: string, newStatus: 'Belum Ditangani' | 'Dalam Proses' | 'Selesai') => void;
   onStartNewComplaint: () => void;
+  onDeleteComplaint: (id: string) => void;
+  onClearAllComplaints: () => void;
 }
 
 export const HistoryView: React.FC<HistoryViewProps> = ({
@@ -27,11 +31,14 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
   onSelectComplaint,
   onUpdateStatus,
   onStartNewComplaint,
+  onDeleteComplaint,
+  onClearAllComplaints,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedChannel, setSelectedChannel] = useState<string>('all');
   const [selectedUrgency, setSelectedUrgency] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
   const filtered = history.filter((item) => {
     const matchesSearch =
@@ -46,6 +53,16 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
 
     return matchesSearch && matchesChannel && matchesUrgency && matchesStatus;
   });
+
+  const handleOpenConfirmClear = () => {
+    if (history.length === 0) return;
+    setIsConfirmModalOpen(true);
+  };
+
+  const handleConfirmClearAll = () => {
+    setIsConfirmModalOpen(false);
+    onClearAllComplaints();
+  };
 
   const getChannelBadge = (ch: ChannelType) => {
     switch (ch) {
@@ -82,13 +99,28 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
             Daftar seluruh komplain yang telah dianalisis bersama catatan status penyelesaian.
           </p>
         </div>
-        <button
-          onClick={onStartNewComplaint}
-          className="px-4 py-2.5 rounded-xl bg-[#7047EB] hover:bg-[#5632C8] text-white text-xs font-bold flex items-center gap-2 shadow-xs transition self-start sm:self-center"
-        >
-          <Sparkles className="w-4 h-4" />
-          <span>+ Tangani Komplain Baru</span>
-        </button>
+        <div className="flex items-center gap-2.5 self-start sm:self-center flex-wrap">
+          {history.length > 0 && (
+            <button
+              type="button"
+              onClick={handleOpenConfirmClear}
+              className="px-3.5 py-2.5 rounded-xl text-rose-600 bg-rose-50 hover:bg-rose-100 hover:text-rose-700 border border-rose-200/70 text-xs font-semibold flex items-center gap-1.5 transition active:scale-98 cursor-pointer shadow-2xs"
+              title="Kosongkan seluruh data riwayat komplain"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              <span>Hapus Semua</span>
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={onStartNewComplaint}
+            className="px-4 py-2.5 rounded-xl bg-[#7047EB] hover:bg-[#5632C8] text-white text-xs font-bold flex items-center gap-2 shadow-xs transition active:scale-98 cursor-pointer"
+          >
+            <Sparkles className="w-4 h-4" />
+            <span>+ Tangani Komplain Baru</span>
+          </button>
+        </div>
       </div>
 
       {/* Search and Filters Bar */}
@@ -154,7 +186,9 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
           <Clock className="w-10 h-10 mx-auto text-slate-300 mb-2" />
           <h3 className="font-bold text-slate-700 text-sm">Tidak ada riwayat komplain yang cocok</h3>
           <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
-            Coba sesuaikan kata kunci pencarian atau reset filter untuk melihat data lainnya.
+            {history.length === 0
+              ? 'Riwayat komplain saat ini kosong. Klik "+ Tangani Komplain Baru" untuk memulai analisis.'
+              : 'Coba sesuaikan kata kunci pencarian atau reset filter untuk melihat data lainnya.'}
           </p>
         </div>
       ) : (
@@ -206,7 +240,7 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
                       <select
                         value={item.status}
                         onChange={(e) => onUpdateStatus(item.id, e.target.value as any)}
-                        className={`text-xs font-bold px-2.5 py-1 rounded-lg border transition ${
+                        className={`text-xs font-bold px-2.5 py-1 rounded-lg border transition cursor-pointer ${
                           item.status === 'Selesai'
                             ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                             : item.status === 'Dalam Proses'
@@ -220,13 +254,30 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
                       </select>
                     </td>
                     <td className="px-6 py-4 align-top text-right whitespace-nowrap">
-                      <button
-                        onClick={() => onSelectComplaint(item)}
-                        className="px-3 py-1.5 rounded-lg bg-[#F2EDFF] hover:bg-[#7047EB] text-[#7047EB] hover:text-white font-bold text-xs inline-flex items-center gap-1.5 transition"
-                      >
-                        <Eye className="w-3.5 h-3.5" />
-                        <span>Buka Draf</span>
-                      </button>
+                      <div className="flex items-center justify-end gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => onSelectComplaint(item)}
+                          className="px-3 py-1.5 rounded-lg bg-[#F2EDFF] hover:bg-[#7047EB] text-[#7047EB] hover:text-white font-bold text-xs inline-flex items-center gap-1.5 transition cursor-pointer"
+                          title="Buka draf balasan dan solusi komplain ini"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                          <span>Buka Draf</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDeleteComplaint(item.id);
+                          }}
+                          className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer"
+                          title="Hapus komplain ini dari riwayat"
+                          aria-label="Hapus komplain"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -240,7 +291,21 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
               <div key={item.id} className="p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   {getChannelBadge(item.channel)}
-                  <span className="text-[11px] text-slate-400">{item.timestamp}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] text-slate-400">{item.timestamp}</span>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDeleteComplaint(item.id);
+                      }}
+                      className="p-1 rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer"
+                      title="Hapus komplain"
+                      aria-label="Hapus komplain"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
                 <div>
                   <h4 className="text-xs font-bold text-slate-800">{item.category}</h4>
@@ -259,15 +324,70 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
                     </span>
                     <span className="text-[10px] text-slate-500">{item.customerEmotion}</span>
                   </div>
-                  <button
-                    onClick={() => onSelectComplaint(item)}
-                    className="px-3 py-1 rounded-lg bg-[#7047EB] text-white text-xs font-bold"
-                  >
-                    Buka
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => onSelectComplaint(item)}
+                      className="px-3 py-1 rounded-lg bg-[#7047EB] text-white text-xs font-bold cursor-pointer"
+                    >
+                      Buka
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* In-App Confirmation Modal (Does not get blocked by iframe sandbox) */}
+      {isConfirmModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-4 animate-in zoom-in-95 duration-150">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 border border-rose-200">
+                  <AlertTriangle className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-slate-800 text-base">
+                    Hapus Semua Riwayat?
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Konfirmasi tindakan pengosongan data
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsConfirmModalOpen(false)}
+                className="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <p className="text-xs text-slate-600 leading-relaxed bg-slate-50 p-3.5 rounded-xl border border-slate-200/70">
+              Tindakan ini akan mengosongkan <strong>{history.length} data komplain</strong> dari penyimpanan browser Anda. Data yang sudah dihapus tidak dapat dipulihkan kembali.
+            </p>
+
+            <div className="flex items-center justify-end gap-2.5 pt-2">
+              <button
+                type="button"
+                onClick={() => setIsConfirmModalOpen(false)}
+                className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-semibold transition cursor-pointer"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmClearAll}
+                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold flex items-center gap-1.5 transition shadow-xs cursor-pointer active:scale-98"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Ya, Hapus Semua</span>
+              </button>
+            </div>
           </div>
         </div>
       )}

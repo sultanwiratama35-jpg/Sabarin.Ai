@@ -14,6 +14,8 @@ import {
   getStoredHistory,
   saveStoredHistory,
   saveStoredProfile,
+  deleteComplaintFromHistory,
+  clearAllComplaintHistory,
 } from './services/complaintService';
 
 export default function App() {
@@ -94,6 +96,24 @@ export default function App() {
     showToast('Status Diperbarui', `Status komplain telah diubah menjadi: ${newStatus}`, 'success');
   };
 
+  const handleDeleteComplaint = (id: string) => {
+    deleteComplaintFromHistory(id);
+    setComplaintsHistory((prev) => prev.filter((item) => item.id !== id));
+    if (activeComplaint?.id === id) {
+      setActiveComplaint(null);
+    }
+    showToast('Riwayat Dihapus', 'Data komplain telah dihapus dari riwayat.', 'info');
+  };
+
+  const handleClearAllComplaints = () => {
+    clearAllComplaintHistory();
+    setComplaintsHistory([]);
+    if (activeComplaint) {
+      setActiveComplaint(null);
+    }
+    showToast('Semua Riwayat Dikosongkan', 'Seluruh data komplain telah dihapus dari penyimpanan.', 'info');
+  };
+
   const handleSaveProfile = (newProfile: BusinessProfile) => {
     setBusinessProfile(newProfile);
     saveStoredProfile(newProfile);
@@ -127,6 +147,7 @@ export default function App() {
         <main className="flex-1 p-4 sm:p-6 lg:p-8">
           {currentTab === 'beranda' && (
             <Dashboard
+              businessProfile={businessProfile}
               onStartComplaint={handleStartNewComplaint}
               recentComplaints={complaintsHistory}
               onOpenComplaint={handleSelectComplaintFromHistory}
@@ -159,6 +180,8 @@ export default function App() {
               onSelectComplaint={handleSelectComplaintFromHistory}
               onUpdateStatus={handleUpdateStatus}
               onStartNewComplaint={handleStartNewComplaint}
+              onDeleteComplaint={handleDeleteComplaint}
+              onClearAllComplaints={handleClearAllComplaints}
             />
           )}
 
