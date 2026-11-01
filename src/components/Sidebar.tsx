@@ -32,7 +32,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const navItems = [
     { id: 'beranda' as NavTab, label: 'Beranda', icon: Home },
-    { id: 'tangani' as NavTab, label: 'Tangani Komplain', icon: MessageSquarePlus, badge: 'AI Siaga' },
+    { id: 'tangani' as NavTab, label: 'Tangani Komplain', icon: MessageSquarePlus },
     { id: 'profil' as NavTab, label: 'Profil Bisnis', icon: Store },
     { id: 'riwayat' as NavTab, label: 'Riwayat Komplain', icon: History },
     { id: 'bantuan' as NavTab, label: 'Bantuan & SOP', icon: HelpCircle },
@@ -136,17 +136,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     />
                     <span>{item.label}</span>
                   </div>
-                  {item.badge && (
-                    <span
-                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                        isActive
-                          ? 'bg-[#7047EB] text-white'
-                          : 'bg-emerald-50 text-emerald-600 border border-emerald-200'
-                      }`}
-                    >
-                      {item.badge}
-                    </span>
-                  )}
                 </button>
               );
             })}
