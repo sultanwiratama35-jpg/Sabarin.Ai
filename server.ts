@@ -99,6 +99,8 @@ app.post('/api/gemini/analyze', async (req: Request, res: Response) => {
       });
     }
 
+    const isWhatsApp = (channel || '').toLowerCase() === 'whatsapp';
+
     const systemInstruction = `Anda adalah Sabarin.ai, AI Crisis Assistant dan pakar mediasi konflik bisnis untuk UMKM (Usaha Mikro, Kecil, dan Menengah) di Indonesia.
 Tugas Anda adalah:
 1. Menganalisis komplain pelanggan secara objektif tanpa terbawa emosi.
@@ -110,10 +112,21 @@ Tugas Anda adalah:
    - empathetic (Versi Utama / Empatik: penuh pengertian, sopan, tulus, menenangkan, tidak defensif)
    - short (Lebih Singkat / Profesional: to-the-point, santun, cocok untuk chat cepat)
    - personal (Lebih Personal: hangat, bersahabat, terasa seperti owner UMKM yang tulus peduli)
-   PENTING: Draf balasan TIDAK boleh menyalahkan pembeli, TIDAK boleh mendebat, dan TIDAK boleh membuat janji ganti rugi sepihak sebelum bukti diverifikasi.
+
+   ATURAN MUTLAK KANAL WHATSAPP:
+   Jika kanal komunikasi yang dipilih adalah 'whatsapp', Anda WAJIB:
+   - Menggunakan nada yang santai, personal, hangat, dan ramah seperti obrolan WhatsApp pemilik UMKM yang sangat peduli dengan pelanggannya.
+   - HARUS menyisipkan emotikon santun (seperti 🙏 atau 😊) di dalam SETIAP teks balasan (empathetic, short, maupun personal).
+   - Hindari bahasa kaku atau birokratis. Buat pelanggan merasa akrab, tenang, dan didengar secara personal.
+   - PENTING: Draf balasan TIDAK boleh menyalahkan pembeli, TIDAK boleh mendebat, dan TIDAK boleh membuat janji ganti rugi sepihak sebelum bukti diverifikasi.
+
 7. Memberikan 2-3 rekomendasi resolusi konkret (mis. Opsi 1: Penggantian Produk, Opsi 2: Pengembalian Dana, Opsi 3: Kompensasi/Voucher) dengan kelebihan dan pertimbangan biaya bagi pemilik toko.
 8. Menentukan 3-4 langkah tindak lanjut praktis (checklist).
 9. Output WAJIB berupa JSON sesuai skema yang ditentukan.`;
+
+    const waInstruction = isWhatsApp
+      ? `\n⚠️ PERHATIAN KHUSUS KANAL WHATSAPP (WAJIB DITAATI):\nKarena komplain ini berasal dari WhatsApp, Anda WAJIB menggunakan nada yang santai, personal, ramah, dan HARUS menyisipkan emotikon santun (seperti 🙏 atau 😊) di dalam setiap versi balasan (empathetic, short, personal).`
+      : '';
 
     const prompt = `Data Komplain:
 - Kanal Komunikasi: ${channel || 'whatsapp'}
@@ -124,6 +137,7 @@ Tugas Anda adalah:
   * Kebijakan Retur: ${businessProfile?.returnPolicy || 'Standar unboxing 1x24 jam'}
   * Kebijakan Refund: ${businessProfile?.refundPolicy || 'Refund jika terbukti cacat produksi/pengiriman'}
   * Tone Brand: ${businessProfile?.brandTone || 'Ramah, sopan, profesional'}
+${waInstruction}
 
 Teks Komplain Pelanggan:
 """${complaintText.replace(/"""/g, '')}"""
@@ -222,11 +236,17 @@ Hasilkan analisis terstruktur dalam format JSON.`;
       problemSummary: 'Produk/layanan mengalami kendala yang dikeluhkan pelanggan dan membutuhkan penanganan segera serta konfirmasi itikad baik dari toko.',
       customerExpectation: 'Permohonan maaf yang tulus dan solusi penggantian produk atau pengembalian dana yang jelas.',
       missingInformation: ['Foto bukti kendala / video unboxing', 'Konfirmasi resi transaksi'],
-      replies: {
-        empathetic: `Halo Kak, terima kasih sudah menghubungi kami dan mengabarkan kendala ini. 🙏\n\nKami turut prihatin dan memohon maaf sebesar-besarnya atas ketidaknyamanan yang terjadi pada pesanan Kakak. Toko kami bertanggung jawab penuh untuk memastikan Kakak mendapatkan solusi terbaik.\n\nMohon kesediaannya mengirimkan foto produk yang berkendala agar dapat segera kami bantu proseskan penggantian baru atau pengembalian dana hari ini juga. Terima kasih atas pengertiannya. 😊`,
-        short: `Halo Kak, kami memohon maaf atas kendala yang dialami. Toko kami siap memproseskan penggantian unit baru atau pengembalian dana. Mohon kirimkan foto produk dan nomor pesanan agar dapat segera kami tangani. Terima kasih.`,
-        personal: `Duh Kak, mohon maaf banget ya atas kejadian ini! Kami ikut nyesek membacanya. Kakak tenang ya, toko kami tanggung jawab penuh kok. Boleh dibantu kirim foto barangnya sebentar Kak? Biar langsung kami siapin solusinya sekarang juga!`,
-      },
+      replies: req.body.channel === 'whatsapp'
+        ? {
+            empathetic: `Halo Kak, terima kasih sudah kabari kami ya. 🙏\n\nKami mohon maaf banget atas ketidaknyamanan yang Kakak alami terkait pesanannya. Toko kami pasti tanggung jawab penuh kok agar Kakak tetap tenang dan puas. 😊\n\nBoleh minta tolong kirimkan foto/video produk yang berkendala sebentar ya Kak? Biar langsung kami bantu proseskan penggantian baru atau pengembalian dana hari ini juga. Makasih banyak atas kesabaran dan kebaikannya ya Kak! 🙏✨`,
+            short: `Halo Kak, mohon maaf banget ya atas kendala pada pesanannya. 🙏 Toko kami siap bantu ganti baru atau refund segera. Boleh kirimkan foto produk dan nomor pesanannya ya Kak? Terima kasih banyak! 😊`,
+            personal: `Duh Kak, kami minta maaf sebesar-besarnya ya! Ikut sedih dengarnya. 🥺 Kakak tenang aja ya, toko kami tanggung jawab penuh kok. Boleh tolong fotokan produknya sebentar ya Kak? Biar langsung kami siapin solusinya sekarang juga! Makasih banyak ya Kak. 🙏😊`,
+          }
+        : {
+            empathetic: `Halo Kak, terima kasih sudah menghubungi kami dan mengabarkan kendala ini. 🙏\n\nKami turut prihatin dan memohon maaf sebesar-besarnya atas ketidaknyamanan yang terjadi pada pesanan Kakak. Toko kami bertanggung jawab penuh untuk memastikan Kakak mendapatkan solusi terbaik.\n\nMohon kesediaannya mengirimkan foto produk yang berkendala agar dapat segera kami bantu proseskan penggantian baru atau pengembalian dana hari ini juga. Terima kasih atas pengertiannya. 😊`,
+            short: `Halo Kak, kami memohon maaf atas kendala yang dialami. Toko kami siap memproseskan penggantian unit baru atau pengembalian dana. Mohon kirimkan foto produk dan nomor pesanan agar dapat segera kami tangani. Terima kasih.`,
+            personal: `Duh Kak, mohon maaf banget ya atas kejadian ini! Kami ikut nyesek membacanya. Kakak tenang ya, toko kami tanggung jawab penuh kok. Boleh dibantu kirim foto barangnya sebentar Kak? Biar langsung kami siapin solusinya sekarang juga!`,
+          },
       recommendations: [
         {
           id: 'opt-resilient-1',

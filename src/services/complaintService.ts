@@ -124,11 +124,17 @@ export function generateLocalSimulation(
       ? 'Yth. Pelanggan, terima kasih atas laporannya pada pesanan ini.'
       : 'Halo Kak, terima kasih atas ulasan dan masukan berharganya untuk bisnis kami.';
 
-  const replies = {
-    empathetic: `${channelGreeting} 🙏\n\nKami sangat memahami kekecewaan dan ketidaknyamanan yang Kakak alami terkait ${productContext || 'pesanan Kakak'}. Kami memohon maaf yang sebesar-besarnya atas kendala ini.\n\nToko kami bertanggung jawab penuh untuk memastikan Kakak mendapatkan solusi terbaik tanpa dipersulit. Mohon berkenan mengirimkan foto/video kondisi produk serta label resi pengiriman agar tim kami dapat segera memproseskan penggantian baru atau pengembalian dana secepatnya.\n\nTerima kasih banyak atas kesabaran dan kebaikan Kakak. 😊`,
-    short: `${channelGreeting} Kami memohon maaf atas kendala pada pesanan ini. Toko kami siap memproseskan penggantian unit baru atau pengembalian dana penuh hari ini juga. Mohon kirimkan foto bukti produk dan nomor resi untuk verifikasi instan. Terima kasih.`,
-    personal: `Duh Kak, mohon maaf banget ya atas ketidaknyamanan ini! Kami ikut nyesek dengarnya. Kakak jangan khawatir ya, kami dari pihak toko siap tanggung jawab penuh sampai tuntas. Boleh dibantu kirim foto barangnya sebentar Kak? Biar langsung kami atur solusinya sekarang juga!`,
-  };
+  const replies = channel === 'whatsapp'
+    ? {
+        empathetic: `Halo Kak, terima kasih sudah kabari kami ya. 🙏\n\nKami mohon maaf banget atas ketidaknyamanan yang dialami terkait ${productContext || 'pesanan Kakak'}. Toko kami pasti tanggung jawab penuh kok agar Kakak tetap tenang dan puas. 😊\n\nBoleh minta tolong kirimkan foto/video produk yang berkendala ya Kak? Biar langsung tim kami bantu siapkan penggantian baru atau pengembalian dana hari ini juga. Makasih banyak atas kesabaran dan kebaikannya ya Kak! 🙏✨`,
+        short: `Halo Kak, mohon maaf banget atas kendala pada pesanan ini ya. 🙏 Toko kami siap bantu proseskan ganti baru atau refund secepatnya. Boleh kirimkan foto produk dan nomor pesanannya ya Kak? Makasih banyak! 😊`,
+        personal: `Duh Kak, mohon maaf banget ya atas ketidaknyamanan ini! Kami ikut nyesek dengarnya. 🥺 Kakak jangan khawatir ya, kami dari pihak toko pasti tanggung jawab penuh kok. Boleh dibantu kirim foto barangnya sebentar ya Kak? Biar langsung kami siapin solusinya sekarang juga! Makasih ya Kak. 🙏😊`,
+      }
+    : {
+        empathetic: `${channelGreeting} 🙏\n\nKami sangat memahami kekecewaan dan ketidaknyamanan yang dialami terkait ${productContext || 'pesanan Anda'}. Kami memohon maaf yang sebesar-besarnya atas kendala ini.\n\nToko kami bertanggung jawab penuh untuk memastikan Anda mendapatkan solusi terbaik tanpa dipersulit. Mohon berkenan mengirimkan foto/video kondisi produk serta label resi pengiriman agar tim kami dapat segera memproseskan penggantian baru atau pengembalian dana secepatnya.\n\nTerima kasih banyak atas kesabaran dan pengertian Anda. 😊`,
+        short: `${channelGreeting} Kami memohon maaf atas kendala pada pesanan ini. Toko kami siap memproseskan penggantian unit baru atau pengembalian dana penuh hari ini juga. Mohon kirimkan foto bukti produk dan nomor resi untuk verifikasi instan. Terima kasih.`,
+        personal: `Duh Kak, mohon maaf banget ya atas ketidaknyamanan ini! Kami ikut nyesek dengarnya. Jangan khawatir ya, kami dari pihak toko siap tanggung jawab penuh sampai tuntas. Boleh dibantu kirim foto barangnya sebentar Kak? Biar langsung kami atur solusinya sekarang juga!`,
+      };
 
   const recommendations = [
     {
